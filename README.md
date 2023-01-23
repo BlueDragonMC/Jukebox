@@ -1,5 +1,6 @@
 # Jukebox
 ![GitHub last commit](https://img.shields.io/github/last-commit/BlueDragonMC/Jukebox)
+[![.github/workflows/gradle.yml](https://github.com/BlueDragonMC/Jukebox/actions/workflows/gradle.yml/badge.svg)](https://github.com/BlueDragonMC/Jukebox/actions/workflows/gradle.yml)
 
 [![BlueDragon Logo](./favicon_64.png)](https://bluedragonmc.com)
 

@@ -1,6 +1,7 @@
 on:
+  workflow_dispatch:
   push:
-    branches: [master]
+    branches: [ master ]
 
 jobs:
   gradle:
@@ -12,9 +13,10 @@ jobs:
         uses: gradle/gradle-build-action@v2
       - name: Run build with Gradle wrapper
         run: ./gradlew build
-      - name: Upload built artifact
-        uses: actions/upload-artifact@v3
+      - name: Release
+        uses: marvinpinto/action-automatic-releases@latest
+        automatic_release_tag: "latest"
+        prerelease: true
+        title: "Development Build"
         with:
-          name: Jukebox.jar
-          path: build/libs/Jukebox-*-all.jar
-          if-no-files-found: error
+          files: build/libs/Jukebox-*-all.jar
