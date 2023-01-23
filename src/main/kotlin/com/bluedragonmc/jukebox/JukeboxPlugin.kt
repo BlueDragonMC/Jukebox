@@ -54,17 +54,9 @@ class JukeboxPlugin @Inject constructor(
                 logger.info("Loaded song \"${it.songName}\" by ${it.originalAuthor.ifEmpty { it.author } } (${it.getDuration()})")
             }
 
-        proxyServer.commandManager.apply {
-            PlayCommand.create().let {
-                register(metaBuilder(it).aliases("play").plugin(this).build(), it)
-            }
-            PauseCommand.create().let {
-                register(metaBuilder(it).aliases("pause").plugin(this).build(), it)
-            }
-            ResumeCommand.create().let {
-                register(metaBuilder(it).aliases("resume").plugin(this).build(), it)
-            }
-        }
+        proxyServer.commandManager.register(PlayCommand.create())
+        proxyServer.commandManager.register(PauseCommand.create())
+        proxyServer.commandManager.register(ResumeCommand.create())
 
         proxyServer.eventManager.register(this) { e: DisconnectEvent ->
             Song.stop(e.player)
