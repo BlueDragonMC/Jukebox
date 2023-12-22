@@ -51,7 +51,7 @@ class JukeboxPlugin @Inject constructor(
             .filter { path -> path.isRegularFile() && path.extension == "nbs" }
             .map { path -> Song.load(path) }
             .onEach {
-                logger.info("Loaded song \"${it.songName}\" by ${it.originalAuthor.ifEmpty { it.author } } (${it.getDuration()})")
+                logger.info("Loaded song \"${it.songName}\" by ${it.originalAuthor.ifEmpty { it.author }} (${it.getDuration()})")
             }
 
         proxyServer.commandManager.register(PlayCommand.create())
@@ -63,5 +63,14 @@ class JukeboxPlugin @Inject constructor(
         }
 
         logger.info("Jukebox plugin successfully initialized.")
+    }
+
+    @Subscribe
+    fun onPlayerLeave(event: DisconnectEvent) {
+        val status = Song.status[event.player]
+        if (status != null) {
+            status.task.cancel()
+            Song.status.remove(event.player)
+        }
     }
 }

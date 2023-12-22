@@ -1,5 +1,9 @@
 package com.bluedragonmc.jukebox
 
+import com.bluedragonmc.jukebox.event.SongEndEvent
+import com.bluedragonmc.jukebox.event.SongPauseEvent
+import com.bluedragonmc.jukebox.event.SongResumeEvent
+import com.bluedragonmc.jukebox.event.SongStartEvent
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.proxy.ProxyServer
 import com.velocitypowered.api.scheduler.ScheduledTask
@@ -10,6 +14,7 @@ import java.time.Duration
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.io.path.nameWithoutExtension
 import kotlin.io.path.readBytes
+import kotlin.io.path.relativeTo
 
 class Song(file: Path) {
 
@@ -25,10 +30,13 @@ class Song(file: Path) {
      */
     private val ticks: Array<List<NBSNote>?>
 
+    val fileName: String = file.relativeTo(JukeboxPlugin.INSTANCE.dataDirectory).toString()
+
     val songName: String
     val author: String
     val originalAuthor: String
     val description: String
+    val durationInTicks: Int get() = ticks.size
 
     init {
         val buffer = ByteBuffer.wrap(file.readBytes()).order(ByteOrder.LITTLE_ENDIAN)
@@ -130,6 +138,7 @@ class Song(file: Path) {
                 // Song has ended
                 task.cancel()
                 status.remove(player)
+                proxyServer.eventManager.fireAndForget(SongEndEvent(player, this))
                 return@buildTask
             }
 
@@ -138,6 +147,7 @@ class Song(file: Path) {
             }
         }.repeat(Duration.ofMillis(interval)).schedule()
         status[player] = Status(false, this, task, currentTick)
+        proxyServer.eventManager.fireAndForget(SongStartEvent(player, this, startTimeInTicks))
     }
 
     fun getDuration(): String {
@@ -161,14 +171,35 @@ class Song(file: Path) {
         val status = mutableMapOf<Player, Status>()
 
         fun pause(player: Player) {
+            status[player]?.let { status ->
+                JukeboxPlugin.INSTANCE.proxyServer.eventManager.fireAndForget(
+                    SongPauseEvent(
+                        player,
+                        status.song,
+                        status.currentTimeInTicks
+                    )
+                )
+            }
             status[player]?.isPaused = true
         }
 
         fun resume(player: Player) {
+            status[player]?.let { status ->
+                JukeboxPlugin.INSTANCE.proxyServer.eventManager.fireAndForget(
+                    SongResumeEvent(
+                        player,
+                        status.song,
+                        status.currentTimeInTicks
+                    )
+                )
+            }
             status[player]?.isPaused = false
         }
 
         fun stop(player: Player) {
+            status[player]?.song?.let { song ->
+                JukeboxPlugin.INSTANCE.proxyServer.eventManager.fireAndForget(SongEndEvent(player, song))
+            }
             status[player]?.task?.cancel()
             status.remove(player)
         }
@@ -182,7 +213,19 @@ class Song(file: Path) {
             song.play(JukeboxPlugin.INSTANCE.proxyServer, player, startTimeInTicks)
         }
 
+        /**
+         * Loads a song from an arbitrary path
+         */
         fun load(path: Path) = Song(path)
-        fun load(name: String) = Song(JukeboxPlugin.INSTANCE.dataDirectory.resolve("songs/$name"))
+
+        /**
+         * Loads a song relative to the Jukebox plugin's `data/songs` directory
+         */
+        fun load(name: String) = loadRelative(Path.of("songs", name))
+
+        /**
+         * Loads a song relative to the Jukebox plugin's data directory
+         */
+        fun loadRelative(path: Path) = Song(JukeboxPlugin.INSTANCE.dataDirectory.resolve(path))
     }
 }
