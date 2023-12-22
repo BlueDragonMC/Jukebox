@@ -18,7 +18,7 @@ class Song(file: Path) {
     /**
      * The tempo of the song, measured in ticks per second.
      */
-    private val tempo: Double
+    val tempo: Double
 
     /**
      * The ticks of this song. Each element contains a tick number and a set of one or more notes to play.
@@ -137,7 +137,7 @@ class Song(file: Path) {
                 it.playTo(player)
             }
         }.repeat(Duration.ofMillis(interval)).schedule()
-        status[player] = Status(false, task, this, currentTick)
+        status[player] = Status(false, this, task, currentTick)
     }
 
     fun getDuration(): String {
@@ -145,7 +145,17 @@ class Song(file: Path) {
         return (seconds / 60).toString().padStart(2, '0') + ":" + (seconds % 60).toString().padStart(2, '0')
     }
 
-    data class Status(var isPaused: Boolean, val task: ScheduledTask, val song: Song, val currentTick: AtomicInteger)
+    data class Status(
+        var isPaused: Boolean,
+        val song: Song,
+        internal val task: ScheduledTask,
+        private val currentTick: AtomicInteger,
+    ) {
+        val currentTimeInTicks get() = currentTick.get()
+        val lengthInTicks get() = song.ticks.size
+        val lengthInSeconds get() = song.ticks.size / song.tempo
+        val notes get() = song.ticks
+    }
 
     companion object {
         val status = mutableMapOf<Player, Status>()
@@ -163,8 +173,8 @@ class Song(file: Path) {
             status.remove(player)
         }
 
-        fun getCurrentSong(player: Player): Song? {
-            return status[player]?.song
+        fun getCurrentSong(player: Player): Status? {
+            return status[player]
         }
 
         fun play(song: Song, player: Player) {
