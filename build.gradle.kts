@@ -29,6 +29,18 @@ dependencies {
     compileOnly("dev.simplix:protocolize-api:2.2.4")
 }
 
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "com.bluedragonmc"
+            artifactId = "Jukebox"
+            version = "1.0-SNAPSHOT"
+
+            from(components["java"])
+        }
+    }
+}
+
 tasks.test {
     useJUnitPlatform()
 }
