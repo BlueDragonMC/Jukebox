@@ -137,7 +137,7 @@ class Song(file: Path) {
                 it.playTo(player)
             }
         }.repeat(Duration.ofMillis(interval)).schedule()
-        status[player] = Status(false, task, this)
+        status[player] = Status(false, task, this, currentTick)
     }
 
     fun getDuration(): String {
@@ -145,7 +145,7 @@ class Song(file: Path) {
         return (seconds / 60).toString().padStart(2, '0') + ":" + (seconds % 60).toString().padStart(2, '0')
     }
 
-    data class Status(var isPaused: Boolean, val task: ScheduledTask, val song: Song)
+    data class Status(var isPaused: Boolean, val task: ScheduledTask, val song: Song, val currentTick: AtomicInteger)
 
     companion object {
         val status = mutableMapOf<Player, Status>()
