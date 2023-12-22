@@ -1,10 +1,12 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     kotlin("jvm") version "1.9.0"
     kotlin("kapt") version "1.9.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     `maven-publish`
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 group = "com.bluedragonmc"
@@ -18,7 +20,7 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("stdlib"))
     testImplementation(kotlin("test"))
 
     compileOnly("com.velocitypowered:velocity-api:3.1.1")
@@ -29,10 +31,6 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
 }
 
 tasks.build {
