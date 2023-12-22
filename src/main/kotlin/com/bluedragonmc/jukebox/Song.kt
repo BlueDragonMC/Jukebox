@@ -119,9 +119,9 @@ class Song(file: Path) {
         }
     }
 
-    private fun play(proxyServer: ProxyServer, player: Player) {
+    private fun play(proxyServer: ProxyServer, player: Player, startTimeInTicks: Int = 0) {
         val interval = (1000.0 / tempo).toLong()
-        val currentTick = AtomicInteger(0)
+        val currentTick = AtomicInteger(startTimeInTicks)
         lateinit var task: ScheduledTask
         task = proxyServer.scheduler.buildTask(JukeboxPlugin.INSTANCE) {
             if (status[player]?.isPaused == true) return@buildTask
@@ -177,9 +177,9 @@ class Song(file: Path) {
             return status[player]
         }
 
-        fun play(song: Song, player: Player) {
+        fun play(song: Song, player: Player, startTimeInTicks: Int = 0) {
             stop(player)
-            song.play(JukeboxPlugin.INSTANCE.proxyServer, player)
+            song.play(JukeboxPlugin.INSTANCE.proxyServer, player, startTimeInTicks)
         }
 
         fun load(path: Path) = Song(path)

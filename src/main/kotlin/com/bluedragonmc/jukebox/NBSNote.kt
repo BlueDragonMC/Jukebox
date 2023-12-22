@@ -23,6 +23,25 @@ class NBSNote(val instrument: Byte, val key: Byte, val velocity: Byte?, val pan:
                 NBSNote(byte, byte, null, null, null)
             }
         }
+
+        private val sounds = arrayOf(
+            Sound.BLOCK_NOTE_BLOCK_HARP,
+            Sound.BLOCK_NOTE_BLOCK_BASS,
+            Sound.BLOCK_NOTE_BLOCK_BASEDRUM,
+            Sound.BLOCK_NOTE_BLOCK_SNARE,
+            Sound.BLOCK_NOTE_BLOCK_HAT,
+            Sound.BLOCK_NOTE_BLOCK_GUITAR,
+            Sound.BLOCK_NOTE_BLOCK_FLUTE,
+            Sound.BLOCK_NOTE_BLOCK_BELL,
+            Sound.BLOCK_NOTE_BLOCK_CHIME,
+            Sound.BLOCK_NOTE_BLOCK_XYLOPHONE,
+            Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE,
+            Sound.BLOCK_NOTE_BLOCK_COW_BELL,
+            Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO,
+            Sound.BLOCK_NOTE_BLOCK_BIT,
+            Sound.BLOCK_NOTE_BLOCK_BANJO,
+            Sound.BLOCK_NOTE_BLOCK_PLING
+        )
     }
 
     private fun getHorizontalDirection(location: Location): Vec2d {
@@ -64,12 +83,13 @@ class NBSNote(val instrument: Byte, val key: Byte, val velocity: Byte?, val pan:
         }
 
         try {
+            val finalKey = key + (pitch ?: 0) / 100
             wrappedPlayer.playSound(
                 position,
                 getSound(),
                 SoundCategory.RECORDS,
                 (velocity?.toFloat() ?: 100f) / 100f,
-                2f.pow((key - 45) / 12f)
+                2f.pow((finalKey - 45) / 12f)
             )
         } catch (e: IllegalStateException) {
             e.printStackTrace()
@@ -81,25 +101,6 @@ class NBSNote(val instrument: Byte, val key: Byte, val velocity: Byte?, val pan:
             )
         }
     }
-
-    private val sounds = arrayOf(
-        Sound.BLOCK_NOTE_BLOCK_HARP,
-        Sound.BLOCK_NOTE_BLOCK_BASS,
-        Sound.BLOCK_NOTE_BLOCK_BASEDRUM,
-        Sound.BLOCK_NOTE_BLOCK_SNARE,
-        Sound.BLOCK_NOTE_BLOCK_HAT,
-        Sound.BLOCK_NOTE_BLOCK_GUITAR,
-        Sound.BLOCK_NOTE_BLOCK_FLUTE,
-        Sound.BLOCK_NOTE_BLOCK_BELL,
-        Sound.BLOCK_NOTE_BLOCK_CHIME,
-        Sound.BLOCK_NOTE_BLOCK_XYLOPHONE,
-        Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE,
-        Sound.BLOCK_NOTE_BLOCK_COW_BELL,
-        Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO,
-        Sound.BLOCK_NOTE_BLOCK_BIT,
-        Sound.BLOCK_NOTE_BLOCK_BANJO,
-        Sound.BLOCK_NOTE_BLOCK_PLING
-    )
 
     private fun getSound(): Sound {
         return if (instrument >= sounds.size) sounds.last() else sounds[instrument.toInt()]
