@@ -16,7 +16,7 @@ object SongSelectGui {
 
     val inventory by lazy {
         val inventory = Inventory(getInventoryType())
-        inventory.title(Component.text("Select Song"))
+        inventory.title(Component.text("选择音乐"))
         for ((i, song) in JukeboxPlugin.INSTANCE.songs.withIndex()) {
             val itemType = ItemType.values()[ItemType.MUSIC_DISC_11.ordinal + (i % 15)]
             val stack = ItemStack(itemType)
