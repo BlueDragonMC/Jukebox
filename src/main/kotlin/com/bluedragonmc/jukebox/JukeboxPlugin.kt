@@ -1,8 +1,15 @@
 package com.bluedragonmc.jukebox
 
+import com.bluedragonmc.jukebox.api.Song
+import com.bluedragonmc.jukebox.api.SongLoader
+import com.bluedragonmc.jukebox.api.SongPlayer
 import com.bluedragonmc.jukebox.command.PauseCommand
 import com.bluedragonmc.jukebox.command.PlayCommand
 import com.bluedragonmc.jukebox.command.ResumeCommand
+import com.bluedragonmc.jukebox.gui.SongSelectGui
+import com.bluedragonmc.jukebox.impl.NBSSongLoader
+import com.bluedragonmc.jukebox.impl.SongPlayerImpl
+import com.bluedragonmc.jukebox.util.getDurationString
 import com.google.inject.Inject
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.connection.DisconnectEvent
@@ -36,6 +43,13 @@ class JukeboxPlugin @Inject constructor(
 
     lateinit var songs: List<Song>
 
+    // Load the default SongLoader and SongPlayer implementations for internal use by the plugin
+    private val songLoader = NBSSongLoader()
+    private val songPlayer = SongPlayerImpl(this, proxyServer)
+
+    fun getSongLoader(): SongLoader = songLoader
+    fun getSongPlayer(proxyServer: ProxyServer, plugin: Any): SongPlayer = SongPlayerImpl(plugin, proxyServer)
+
     @Subscribe
     fun onInit(event: ProxyInitializeEvent) {
         INSTANCE = this
@@ -49,28 +63,23 @@ class JukeboxPlugin @Inject constructor(
 
         songs = songsFolder.listDirectoryEntries()
             .filter { path -> path.isRegularFile() && path.extension == "nbs" }
-            .map { path -> Song.load(path) }
+            .map { path -> songLoader.load(path.name, path.readBytes()) }
             .onEach {
-                logger.info("Loaded song \"${it.songName}\" by ${it.originalAuthor.ifEmpty { it.author }} (${it.getDuration()})")
+                val author = it.originalAuthor.ifEmpty { it.author }
+                logger.info("Loaded song \"${it.songName}\" by $author (${getDurationString(it)})")
             }
 
-        proxyServer.commandManager.register(PlayCommand.create())
-        proxyServer.commandManager.register(PauseCommand.create())
-        proxyServer.commandManager.register(ResumeCommand.create())
+        val songSelect = SongSelectGui(songPlayer)
 
-        proxyServer.eventManager.register(this) { e: DisconnectEvent ->
-            Song.stop(e.player)
-        }
+        proxyServer.commandManager.register(PlayCommand.create(songSelect))
+        proxyServer.commandManager.register(PauseCommand.create(songPlayer))
+        proxyServer.commandManager.register(ResumeCommand.create(songPlayer))
 
         logger.info("Jukebox plugin successfully initialized.")
     }
 
     @Subscribe
     fun onPlayerLeave(event: DisconnectEvent) {
-        val status = Song.status[event.player]
-        if (status != null) {
-            status.task.cancel()
-            Song.status.remove(event.player)
-        }
+        songPlayer.stop(event.player)
     }
 }

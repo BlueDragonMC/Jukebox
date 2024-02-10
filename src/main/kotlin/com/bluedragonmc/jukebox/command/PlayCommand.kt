@@ -11,12 +11,13 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 
 object PlayCommand {
-    fun create(): BrigadierCommand {
+    fun create(songSelectGui: SongSelectGui): BrigadierCommand {
         val node = LiteralArgumentBuilder.literal<CommandSource>("play")
             .requires { source -> source.hasPermission("jukebox.play") }
             .executes { context ->
                 if (context.source is Player) {
-                    Protocolize.playerProvider().player((context.source as Player).uniqueId)?.openInventory(SongSelectGui.inventory)
+                    Protocolize.playerProvider().player((context.source as Player).uniqueId)
+                        ?.openInventory(songSelectGui.inventory)
                 } else {
                     context.source.sendMessage(
                         Component.text(

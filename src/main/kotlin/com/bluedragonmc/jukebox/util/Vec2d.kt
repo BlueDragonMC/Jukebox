@@ -1,4 +1,4 @@
-package com.bluedragonmc.jukebox
+package com.bluedragonmc.jukebox.util
 
 import kotlin.math.cos
 import kotlin.math.sin

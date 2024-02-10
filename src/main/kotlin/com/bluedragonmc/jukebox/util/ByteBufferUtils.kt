@@ -1,4 +1,4 @@
-package com.bluedragonmc.jukebox
+package com.bluedragonmc.jukebox.util
 
 import java.nio.ByteBuffer
 import java.nio.CharBuffer

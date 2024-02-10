@@ -1,6 +1,6 @@
 package com.bluedragonmc.jukebox.command
 
-import com.bluedragonmc.jukebox.Song
+import com.bluedragonmc.jukebox.api.SongPlayer
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.velocitypowered.api.command.BrigadierCommand
@@ -10,12 +10,12 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 
 object ResumeCommand {
-    fun create(): BrigadierCommand {
+    fun create(songPlayer: SongPlayer): BrigadierCommand {
         val node = LiteralArgumentBuilder.literal<CommandSource>("resume")
             .requires { source -> source.hasPermission("jukebox.resume") }
             .executes { context ->
                 if (context.source is Player) {
-                    Song.resume(context.source as Player)
+                    songPlayer.resume(context.source as Player)
                 } else {
                     context.source.sendMessage(
                         Component.text(
