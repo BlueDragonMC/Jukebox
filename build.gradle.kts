@@ -48,3 +48,7 @@ tasks.test {
 tasks.build {
     dependsOn(tasks.shadowJar)
 }
+
+tasks.shadowJar {
+    relocate("kotlin", "${rootProject.group}.${rootProject.name}.kotlin")
+}
