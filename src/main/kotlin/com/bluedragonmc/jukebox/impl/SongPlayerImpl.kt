@@ -54,6 +54,7 @@ class SongPlayerImpl(private val plugin: Any, private val proxyServer: ProxyServ
     }
 
     override fun stop(player: Player) {
+        statuses[player]?.task?.cancel()
         statuses[player]?.song?.let { song ->
             proxyServer.eventManager.fireAndForget(SongEndEvent(player, song))
         }
