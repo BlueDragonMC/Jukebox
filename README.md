@@ -12,11 +12,6 @@
 This plugin requires [Protocolize](https://github.com/Exceptionflug/protocolize) for sound effects and
 inventories ([SpigotMC page](https://www.spigotmc.org/resources/protocolize-protocollib-for-bungeecord-waterfall-velocity.63778/)).
 
-> [!NOTE]
-> Protocolize for Velocity does not support packet-based inventories on 1.20.4.
-> For now, you can check out our [Protocolize fork](https://github.com/BlueDragonMC/protocolize/tree/velocity-nbt-component-converter)
-> for a workaround or run [the 1.20.1 version](https://github.com/BlueDragonMC/Jukebox/tree/a0d80dfc74d50353042a01e7fa262d3470219df4) of this plugin.
-
 ## Usage as a Velocity Plugin
 
 **Setup**:
