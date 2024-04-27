@@ -1,6 +1,6 @@
 package com.bluedragonmc.jukebox.command
 
-import com.bluedragonmc.jukebox.Song
+import com.bluedragonmc.jukebox.api.SongPlayer
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.velocitypowered.api.command.BrigadierCommand
@@ -10,12 +10,13 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 
 object PauseCommand {
-    fun create(): BrigadierCommand {
+
+    fun create(songPlayer: SongPlayer): BrigadierCommand {
         val node = LiteralArgumentBuilder.literal<CommandSource>("pause")
             .requires { source -> source.hasPermission("jukebox.pause") }
             .executes { context ->
                 if (context.source is Player) {
-                    Song.pause(context.source as Player)
+                    songPlayer.pause(context.source as Player)
                 } else {
                     context.source.sendMessage(
                         Component.text(

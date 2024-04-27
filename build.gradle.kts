@@ -26,7 +26,7 @@ dependencies {
     compileOnly("com.velocitypowered:velocity-api:3.1.1")
     kapt("com.velocitypowered:velocity-api:3.0.1")
 
-    compileOnly("dev.simplix:protocolize-api:2.2.4")
+    compileOnly("dev.simplix:protocolize-api:2.3.3")
 }
 
 publishing {
@@ -47,4 +47,8 @@ tasks.test {
 
 tasks.build {
     dependsOn(tasks.shadowJar)
+}
+
+tasks.shadowJar {
+    relocate("kotlin", "${rootProject.group}.${rootProject.name}.kotlin")
 }

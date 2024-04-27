@@ -1,7 +1,9 @@
 package com.bluedragonmc.jukebox.gui
 
 import com.bluedragonmc.jukebox.JukeboxPlugin
-import com.bluedragonmc.jukebox.Song
+import com.bluedragonmc.jukebox.api.SongPlayer
+import com.bluedragonmc.jukebox.util.getDurationString
+import dev.simplix.protocolize.api.chat.ChatElement
 import dev.simplix.protocolize.api.inventory.Inventory
 import dev.simplix.protocolize.api.item.ItemStack
 import dev.simplix.protocolize.data.ItemType
@@ -10,20 +12,24 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 
-object SongSelectGui {
+class SongSelectGui(private val songPlayer: SongPlayer) {
 
     private fun Component.noItalic() = decoration(TextDecoration.ITALIC, false)
 
+    private fun Component.asChatElement() = ChatElement.of(this)
+
     val inventory by lazy {
         val inventory = Inventory(getInventoryType())
-        inventory.title(Component.text("选择音乐"))
+        inventory.title(Component.text("选择音乐").asChatElement())
         for ((i, song) in JukeboxPlugin.INSTANCE.songs.withIndex()) {
-            val itemType = ItemType.values()[ItemType.MUSIC_DISC_11.ordinal + (i % 15)]
+            val itemType = ItemType.entries[ItemType.MUSIC_DISC_11.ordinal + (i % 15)]
             val stack = ItemStack(itemType)
-                .displayName(Component.text(song.songName, NamedTextColor.WHITE).noItalic())
-            stack.addToLore(Component.empty())
-            stack.addToLore(Component.text(song.originalAuthor.ifEmpty { song.author }, NamedTextColor.WHITE).noItalic())
-            stack.addToLore(Component.text(song.getDuration(), NamedTextColor.AQUA).noItalic())
+            stack.displayName(Component.text(song.songName, NamedTextColor.WHITE).noItalic().asChatElement())
+            stack.addToLore(Component.empty().asChatElement())
+            stack.addToLore(
+                Component.text(song.originalAuthor.ifEmpty { song.author }, NamedTextColor.WHITE).noItalic().asChatElement()
+            )
+            stack.addToLore(Component.text(getDurationString(song), NamedTextColor.AQUA).noItalic().asChatElement())
             inventory.item(i, stack)
         }
         inventory.onClick { click ->
@@ -32,7 +38,7 @@ object SongSelectGui {
                 val song = JukeboxPlugin.INSTANCE.songs[click.slot()]
                 val player = JukeboxPlugin.INSTANCE.proxyServer.getPlayer(click.player().uniqueId())
                 if (player.isEmpty) return@onClick
-                Song.play(song, player.get())
+                songPlayer.play(song, player.get())
                 click.player().closeInventory()
             }
         }
