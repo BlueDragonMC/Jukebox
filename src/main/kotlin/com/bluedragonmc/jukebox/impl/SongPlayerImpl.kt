@@ -70,7 +70,7 @@ class SongPlayerImpl(private val plugin: Any, private val proxyServer: ProxyServ
         val interval = (1000.0 / song.tempo).toLong()
         val currentTick = AtomicInteger(startTimeInTicks)
         lateinit var task: ScheduledTask
-        task = proxyServer.scheduler.buildTask(plugin) {
+        task = proxyServer.scheduler.buildTask(plugin) { _ ->
             if (statuses[player]?.isPaused == true) return@buildTask
             val tick = currentTick.getAndIncrement()
             if (tick >= song.durationInTicks) {
