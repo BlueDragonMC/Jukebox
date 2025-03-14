@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm") version "2.0.20"
     kotlin("kapt") version "2.0.20"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
     `maven-publish`
 }
 
@@ -23,8 +23,8 @@ dependencies {
     implementation(kotlin("stdlib"))
     testImplementation(kotlin("test"))
 
-    compileOnly("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
-    kapt("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
+    compileOnly("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
+    kapt("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
 
     compileOnly("dev.simplix:protocolize-api:2.4.1")
 }
