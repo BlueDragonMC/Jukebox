@@ -14,6 +14,7 @@ import com.velocitypowered.api.scheduler.ScheduledTask
 import dev.simplix.protocolize.api.Location
 import dev.simplix.protocolize.api.Protocolize
 import dev.simplix.protocolize.api.SoundCategory
+import dev.simplix.protocolize.data.Sound
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import java.time.Duration
@@ -86,6 +87,29 @@ class SongPlayerImpl(private val plugin: Any, private val proxyServer: ProxyServ
         }.repeat(Duration.ofMillis(interval)).schedule()
         statuses[player] = SongStatusImpl(player, false, song, task, currentTick)
         proxyServer.eventManager.fireAndForget(SongStartEvent(player, song, startTimeInTicks))
+    }
+
+    private val sounds = arrayOf(
+        Sound.BLOCK_NOTE_BLOCK_HARP,
+        Sound.BLOCK_NOTE_BLOCK_BASS,
+        Sound.BLOCK_NOTE_BLOCK_BASEDRUM,
+        Sound.BLOCK_NOTE_BLOCK_SNARE,
+        Sound.BLOCK_NOTE_BLOCK_HAT,
+        Sound.BLOCK_NOTE_BLOCK_GUITAR,
+        Sound.BLOCK_NOTE_BLOCK_FLUTE,
+        Sound.BLOCK_NOTE_BLOCK_BELL,
+        Sound.BLOCK_NOTE_BLOCK_CHIME,
+        Sound.BLOCK_NOTE_BLOCK_XYLOPHONE,
+        Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE,
+        Sound.BLOCK_NOTE_BLOCK_COW_BELL,
+        Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO,
+        Sound.BLOCK_NOTE_BLOCK_BIT,
+        Sound.BLOCK_NOTE_BLOCK_BANJO,
+        Sound.BLOCK_NOTE_BLOCK_PLING
+    )
+
+    private fun Note.getSound(): Sound {
+        return if (instrument >= sounds.size) sounds.last() else sounds[instrument.toInt()]
     }
 
     fun playNote(note: Note, player: Player) {
