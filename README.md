@@ -41,11 +41,11 @@ Add the following (or similar) to your build file:
 
 ```kotlin
 repositories {
-    maven(url = "https://jitpack.io")
+    maven(url = "https://reposilite.bluedragonmc.com/releases")
 }
 
 dependencies {
-    implementation("com.github.BlueDragonMC:Jukebox:${version}")
+    implementation("com.bluedragonmc:jukebox:${version}")
 }
 ```
 
