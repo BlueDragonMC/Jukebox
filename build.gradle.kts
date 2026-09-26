@@ -40,6 +40,12 @@ val javadocJar by tasks.registering(Jar::class) {
     archiveClassifier.set("javadoc")
 }
 
+tasks.processResources {
+    from(rootProject.file("LICENSE")) {
+        into("META-INF")
+    }
+}
+
 fun isInCI() = System.getenv("CI") != null
 
 fun getPublishingVersion(): String = if (isInCI()) {
@@ -76,6 +82,16 @@ publishing {
             from(components["java"])
             artifact(sourcesJar)
             artifact(javadocJar)
+
+            pom {
+                licenses {
+                    license {
+                        name = "MIT License"
+                        url = "https://opensource.org/licenses/MIT"
+                        distribution = "repo"
+                    }
+                }
+            }
         }
     }
 }
